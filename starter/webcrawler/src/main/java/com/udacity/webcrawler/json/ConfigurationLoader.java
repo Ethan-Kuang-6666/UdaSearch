@@ -30,23 +30,12 @@ public final class ConfigurationLoader {
    *
    * @return the loaded {@link CrawlerConfiguration}.
    */
-  public CrawlerConfiguration load() {
+  public CrawlerConfiguration load() throws IOException {
     // TODO: Fill in this method.
-    Reader reader = null;
-    try {
-      reader = Files.newBufferedReader(path);
-      CrawlerConfiguration result = read(reader);
-      reader.close();
-      return result;
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    } finally {
-      try {
-        reader.close();
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
+    Reader reader = Files.newBufferedReader(path);
+    CrawlerConfiguration result = read(reader);
+    reader.close();
+    return result;
   }
 
   /**
@@ -62,9 +51,8 @@ public final class ConfigurationLoader {
     // TODO: Fill in this method
 
     ObjectMapper objectMapper = new ObjectMapper();
-
+    objectMapper.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
     try {
-      objectMapper.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
       return objectMapper.readValue(reader, CrawlerConfiguration.class);
     } catch (IOException e) {
       throw new RuntimeException(e);
