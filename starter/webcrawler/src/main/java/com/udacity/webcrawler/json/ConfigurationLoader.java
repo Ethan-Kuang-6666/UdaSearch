@@ -1,7 +1,9 @@
 package com.udacity.webcrawler.json;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -43,6 +45,12 @@ public final class ConfigurationLoader {
     Objects.requireNonNull(reader);
     // TODO: Fill in this method
 
-    return new CrawlerConfiguration.Builder().build();
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    try {
+      return objectMapper.readValue(reader, CrawlerConfiguration.class);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
