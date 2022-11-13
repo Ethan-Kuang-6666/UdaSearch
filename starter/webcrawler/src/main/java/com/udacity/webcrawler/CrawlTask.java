@@ -122,20 +122,24 @@ public class CrawlTask extends RecursiveAction {
                 return;
             }
         }
+        final Lock lockOne = new ReentrantLock();
+        lockOne.lock();   // This part is being locked.
         if (visitedUrls.contains(url)) {
+            lockOne.unlock();
             return;
         }
         visitedUrls.add(url);
+        lockOne.unlock();
         PageParser.Result result = parserFactory.get(url).parse();
-        final Lock lock = new ReentrantLock();
+        final Lock lockTwo = new ReentrantLock();
         for (Map.Entry<String, Integer> e : result.getWordCounts().entrySet()) {
-            lock.lock();
+            lockTwo.lock();
             if (counts.containsKey(e.getKey())) {
                 counts.put(e.getKey(), e.getValue() + counts.get(e.getKey()));
             } else {
                 counts.put(e.getKey(), e.getValue());
             }
-            lock.unlock();
+            lockTwo.unlock();
         }
         Builder builder = new Builder().setDeadline(deadline)
                 .setMaxDepth(maxDepth - 1)
