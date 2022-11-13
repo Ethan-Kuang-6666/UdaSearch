@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
 
 
@@ -125,12 +127,15 @@ public class CrawlTask extends RecursiveAction {
         }
         visitedUrls.add(url);
         PageParser.Result result = parserFactory.get(url).parse();
+        final Lock lock = new ReentrantLock();
         for (Map.Entry<String, Integer> e : result.getWordCounts().entrySet()) {
+            lock.lock();
             if (counts.containsKey(e.getKey())) {
                 counts.put(e.getKey(), e.getValue() + counts.get(e.getKey()));
             } else {
                 counts.put(e.getKey(), e.getValue());
             }
+            lock.unlock();
         }
         Builder builder = new Builder().setDeadline(deadline)
                 .setMaxDepth(maxDepth - 1)

@@ -49,8 +49,29 @@ final class ParallelWebCrawler implements WebCrawler {
     Instant deadline = clock.instant().plus(timeout);
     Map<String, Integer> counts = new ConcurrentHashMap<>();
     Set<String> visitedUrls = new ConcurrentSkipListSet<>();
+    CrawlTask.Builder builder = new CrawlTask.Builder()
+            .setDeadline(deadline)
+            .setMaxDepth(maxDepth)
+            .setCounts(counts)
+            .setVisitedUrls(visitedUrls)
+            .setParserFactory(parserFactory)
+            .setIgnoredUrls(ignoredUrls)
+            .setClock(clock);
+    List<CrawlTask> tasks = startingUrls.stream().map(url -> builder.setUrl(url).build()).toList();
+    for (CrawlTask t : tasks) {
+      pool.invoke(t);
+    }
+    if (counts.isEmpty()) {
+      return new CrawlResult.Builder()
+              .setWordCounts(counts)
+              .setUrlsVisited(visitedUrls.size())
+              .build();
+    }
 
-    return new CrawlResult.Builder().build();
+    return new CrawlResult.Builder()
+            .setWordCounts(WordCounts.sort(counts, popularWordCount))
+            .setUrlsVisited(visitedUrls.size())
+            .build();
   }
 
   @Override
