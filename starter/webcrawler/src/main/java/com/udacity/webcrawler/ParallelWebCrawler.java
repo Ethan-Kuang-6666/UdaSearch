@@ -6,7 +6,10 @@ import com.udacity.webcrawler.parser.PageParserFactory;
 import javax.inject.Inject;
 import java.time.Clock;
 import java.time.Duration;
-import java.util.List;
+import java.time.Instant;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ForkJoinPool;
 import java.util.regex.Pattern;
 
@@ -43,7 +46,9 @@ final class ParallelWebCrawler implements WebCrawler {
 
   @Override
   public CrawlResult crawl(List<String> startingUrls) {
-
+    Instant deadline = clock.instant().plus(timeout);
+    Map<String, Integer> counts = new ConcurrentHashMap<>();
+    Set<String> visitedUrls = new ConcurrentSkipListSet<>();
 
     return new CrawlResult.Builder().build();
   }
