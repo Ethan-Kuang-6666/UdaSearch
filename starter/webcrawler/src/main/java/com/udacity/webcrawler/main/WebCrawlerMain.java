@@ -41,11 +41,20 @@ public final class WebCrawlerMain {
     if (config.getResultPath() == "") {
       Writer writer = new BufferedWriter(new OutputStreamWriter(System.out));
       resultWriter.write(writer);
+      writer.close();
     } else {
       Path path = Paths.get(config.getResultPath());
       resultWriter.write(path);
     }
     // TODO: Write the profile data to a text file (or System.out if the file name is empty)
+    if (config.getProfileOutputPath() == "") {
+      Writer writer = new BufferedWriter(new OutputStreamWriter(System.out));
+      profiler.writeData(writer);
+      writer.close();
+    } else {
+      Path path = Paths.get(config.getProfileOutputPath());
+      profiler.writeData(path);
+    }
   }
 
   public static void main(String[] args) throws Exception {
