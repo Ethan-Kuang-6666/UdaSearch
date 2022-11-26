@@ -42,9 +42,9 @@ final class ProfilingMethodInterceptor implements InvocationHandler {
     } catch (InvocationTargetException e) {
       throw e.getTargetException();
     } finally {
-      Instant after = clock.instant();
-      duration = Duration.between(before, after);
       if (method.isAnnotationPresent(Profiled.class)) {
+        Instant after = clock.instant();
+        duration = Duration.between(before, after);
         state.record(delegate.getClass(), method, duration);
       }
     }
